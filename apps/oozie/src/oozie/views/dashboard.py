@@ -336,9 +336,10 @@ def list_oozie_workflow(request, job_id):
         workflow_data = new_workflow.get_data()
         credentials = Credentials()
       else:
-        # For workflows submitted from CLI or deleted in the editor
-        # Until better parsing in https://issues.cloudera.org/browse/HUE-2659
-        workflow_graph, full_node_list = OldWorkflow.gen_status_graph_from_xml(request.user, oozie_workflow)
+        try:
+          workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
+        except Exception, e:
+          LOG.exception(_('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e)))
     except:
       LOG.exception("Error generating full page for running workflow %s" % job_id)
   else:
