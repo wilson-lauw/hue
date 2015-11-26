@@ -93,12 +93,10 @@ class ImpalaDbms(HiveServer2Dbms):
       if tables:
         for table in tables:
           hql = "INVALIDATE METADATA `%s`.`%s`" % (database, table,)
-          print hql
           query = hql_query(hql, database, query_type=QUERY_TYPES[1])
           handle = self.execute_and_wait(query, timeout_sec=10.0)
       else:  # call INVALIDATE on entire DB to pick up newly created tables
         hql = "INVALIDATE METADATA `%s`" % database
-        print hql
         query = hql_query(hql, database, query_type=QUERY_TYPES[1])
         handle = self.execute_and_wait(query, timeout_sec=10.0)
     except Exception, e:

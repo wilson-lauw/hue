@@ -15,39 +15,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-## Main views are inherited from Beeswax.
-
-
 import logging
-import json
 
-from desktop.lib.django_util import JsonResponse
-
-from beeswax.api import error_handler
-from beeswax.server import dbms as beeswax_dbms
-
-from impala import dbms
+from beeswax.server.hive_server2_lib import HiveServerClient
 
 
 LOG = logging.getLogger(__name__)
 
 
-@error_handler
-def refresh_tables(request):
-  query_server = dbms.get_query_server_config()
-  db = beeswax_dbms.get(request.user, query_server=query_server)
+class ImpalaServerClient(HiveServerClient):
 
-  response = {'status': 0, 'message': ''}
-
-  if request.method == "POST":
-    try:
-      database = json.loads(request.POST['database'])
-      added = json.loads(request.POST.get('added', []))
-      removed = json.loads(request.POST.get('removed', []))
-
-      db.invalidate_tables(database, added + removed)
-    except Exception, e:
-      response['message'] = str(e)
-
-  return JsonResponse(response)
+  def resetCatalog(self):
+    return self._client.ResetCatalog()
